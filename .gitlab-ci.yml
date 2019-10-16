@@ -15,8 +15,8 @@ before_script:
 
 stages:
   - flow
-  - build
   - tests
+  - build
   - bundle_analyzer
   - storybook
   - deploy
@@ -79,7 +79,6 @@ storybook:
   stage: storybook
   extends: .show_env_variables
   extends: .install_dependencies
-  stage: flow
   script: echo 'Build storybook'
 
 bundle_analyzer:
