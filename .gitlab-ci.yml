@@ -3,8 +3,11 @@ variables:
 
 stages:
   - flow
+  - storybook
+  - bundle_analyzer
   - build
   - deploy
+  - tests
 
 # Extends
 .deploy_to_dev:
@@ -53,70 +56,82 @@ flow:
     - echo 'check flow'
 
 flow:coverage:
-    extends: .show_env_variables
-    extends: .install_dependencies
-    stage: flow
-    script: 
-      - echo 'flow coverage 100%'
-
-build:branch:
-  stage: build
-  variables:
-    ENVR: "branch"
+  extends: .show_env_variables
+  extends: .install_dependencies
+  stage: flow
   script: 
-    - echo $ENVR
-    - echo build run in branch mode > envr.txt
-  cache:
-    policy: push
-    paths:
-      - envr.txt
-  artifacts:
-    paths:
-      - envr.txt
-  tags:
-    - cluster
-    - kubernetes
+    - echo 'flow coverage 100%'
 
-build:stage:
+storybook:
+  stage: storybook
+  extends: .show_env_variables
+  extends: .install_dependencies
+  stage: flow
+  script: echo 'Build storybook'
+
+bundle_analyzer:
+  extends: .show_env_variables
+  extends: .install_dependencies
+  stage: bundle_analyzer
+  script: echo 'Bundle analyzer'
+
+build:master:
+  extends: .show_env_variables
   stage: build
-  variables:
-    ENVR: "stage"
-  script: 
-    - echo $ENVR
-    - echo build run in stage mode > envr.txt
-  cache:
-    policy: push
-    paths:
-      - envr.txt
-  artifacts:
-    paths:
-      - envr.txt
-  when: manual
-  tags:
-    - cluster
-    - kubernetes
+  only:
+    refs:
+      - master
+  script:
+    - export CURRENT_HASH=$(echo $(git rev-parse --short HEAD))
+    - echo $CURRENT_HASH
+    - export COMMIT_MESSAGE="$(echo $(git log -n 1 --pretty=format:%B))"
+    - echo $COMMIT_MESSAGE
+    - export VERSION_TYPE="patch"
+    - export TAG=$(echo $(git tag --contains $CURRENT_HASH))
+    - echo $TAG
+    #- export VERSION_TYPE=$(node pipelines/get-version-type.js "$COMMIT_MESSAGE")
+    - if [ ! -z "$TAG" ] ; then exit 0; fi
+    - echo $VERSION_TYPE
+    - git --version
+    - git status
+    - git config --global push.default simple
+    - git config --global user.email "circleci@example.com"
+    - git config --global user.name "CircleCI"
+    - npm version $VERSION_TYPE -m "v%s"
+    - git status
+    - git push --follow-tags
     
-deploy:branch:
-  stage: deploy
-  script: 
-    - echo deploy branch
-    - cat envr.txt
-  artifacts:
-    paths:
-      - envr.txt
-  tags:
-    - cluster
-    - kubernetes
-
 deploy:stage:
   stage: deploy
+  only:
+    refs:
+      - master
   script: 
-    - echo deploy stage
-    - cat envr.txt
+    - echo 'Deploy to stage'
+
+tests:e2e:
+  extends: .show_env_variables
+  extends: .install_dependencies
+  stage: tests
+  script: 
+    - echo 'Bundle analyzer'
+    - echo Simulation e2e testing
+    - npm run test:ci
+  needs: ["deploy:stage"]
   artifacts:
-    paths:
-      - envr.txt
-  needs: ["build:stage"]
-  tags:
-    - cluster
-    - kubernetes
+    paths: 
+      - coverage
+    name: coverage
+
+tests:unit:
+  extends: .show_env_variables
+  extends: .install_dependencies
+  stage: bundle_analyzer
+  script: 
+    - echo 'Bundle analyzer'
+    - echo Simulation e2e testing
+    - npm run test:ci
+  artifacts:
+    paths: 
+      - coverage
+    name: coverage
