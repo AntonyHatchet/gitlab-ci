@@ -52,7 +52,6 @@ flow:
   extends: .install_dependencies
   stage: flow
   script:
-    - checkout
     - echo 'check flow'
 
 build:branch:
