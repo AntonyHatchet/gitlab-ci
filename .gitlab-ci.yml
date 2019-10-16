@@ -38,8 +38,6 @@ stages:
   script: yarn --no-progress --frozen-lockfile
 
 .show_env_variables:
-  environment:
-    name: Env variables
   script:
     - echo $REPO_VARIABLE
     - echo $CONTEXT
@@ -53,6 +51,13 @@ flow:
   stage: flow
   script:
     - echo 'check flow'
+
+flow:coverage:
+    extends: .show_env_variables
+    extends: .install_dependencies
+    stage: flow
+    script: 
+      - echo 'flow coverage 100%'
 
 build:branch:
   stage: build
