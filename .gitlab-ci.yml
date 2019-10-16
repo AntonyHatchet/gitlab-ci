@@ -1,5 +1,5 @@
-variables:
-    ENVR: ""
+image:
+  name: node:latest
 
 stages:
   - flow
