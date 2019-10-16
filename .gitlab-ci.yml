@@ -3,10 +3,10 @@ variables:
 
 stages:
   - flow
-  - storybook
-  - bundle_analyzer
   - build
   - tests
+  - bundle_analyzer
+  - storybook
   - deploy
   - e2e
 
