@@ -96,17 +96,15 @@ build:master:
     - git --version
     - git status
     - git config --global push.default simple
-    - git config --global user.email "circleci@example.com"
-    - git config --global user.name "CircleCI"
+    - git config --global user.email "gitlab@example.com"
+    - git config --global user.name "Gitlab"
     - npm version $VERSION_TYPE -m "v%s"
     - git status
     - git push --follow-tags
     
 deploy:stage:
   stage: deploy
-  only:
-    refs:
-      - master
+  needs: ["build:master"]
   script: 
     - echo 'Deploy to stage'
 
