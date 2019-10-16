@@ -6,8 +6,9 @@ stages:
   - storybook
   - bundle_analyzer
   - build
-  - deploy
   - tests
+  - deploy
+  - e2e
 
 # Extends
 .deploy_to_dev:
@@ -109,10 +110,10 @@ deploy:stage:
   script: 
     - echo 'Deploy to stage'
 
-tests:e2e:
+e2e:
   extends: .show_env_variables
   extends: .install_dependencies
-  stage: tests
+  stage: e2e
   script: 
     - echo 'Bundle analyzer'
     - echo Simulation e2e testing
@@ -126,7 +127,7 @@ tests:e2e:
 tests:unit:
   extends: .show_env_variables
   extends: .install_dependencies
-  stage: bundle_analyzer
+  stage: tests
   script: 
     - echo 'Bundle analyzer'
     - echo Simulation e2e testing
