@@ -114,6 +114,9 @@ e2e:
   extends: .show_env_variables
   extends: .install_dependencies
   stage: e2e
+  only:
+    refs:
+      - master
   script: 
     - echo 'Bundle analyzer'
     - echo Simulation e2e testing
