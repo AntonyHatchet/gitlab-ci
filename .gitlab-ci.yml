@@ -1,0 +1,118 @@
+variables:
+    ENVR: ""
+
+stages:
+  - flow
+  - build
+  - deploy
+
+# Extends
+.deploy_to_dev:
+  environment:
+    context: dev
+  filters:
+    branches:
+      only:
+        - /feature\/.*/
+        - /bugfix\/.*/
+
+.deploy_to_stage:
+  environment:
+    context: stage
+  filters:
+    tags:
+      only: /v.*/
+    branches:
+      ignore: /.*/
+
+.deploy_to_production:
+  environment:
+    context: production
+  filters:
+    tags:
+      only: /v.*/
+    branches:
+      ignore: /.*/
+
+.install_dependencies: 
+  script: yarn --no-progress --frozen-lockfile
+
+.show_env_variables:
+  environment:
+    name: Env variables
+  script:
+    - echo $REPO_VARIABLE
+    - echo $CONTEXT
+    - echo $API_URL
+    - echo $TOKEN
+
+# Jobs
+flow:
+  extends: .show_env_variables
+  extends: .install_dependencies
+  stage: flow
+  script:
+    - checkout
+    - echo 'check flow'
+
+build:branch:
+  stage: build
+  variables:
+    ENVR: "branch"
+  script: 
+    - echo $ENVR
+    - echo build run in branch mode > envr.txt
+  cache:
+    policy: push
+    paths:
+      - envr.txt
+  artifacts:
+    paths:
+      - envr.txt
+  tags:
+    - cluster
+    - kubernetes
+
+build:stage:
+  stage: build
+  variables:
+    ENVR: "stage"
+  script: 
+    - echo $ENVR
+    - echo build run in stage mode > envr.txt
+  cache:
+    policy: push
+    paths:
+      - envr.txt
+  artifacts:
+    paths:
+      - envr.txt
+  when: manual
+  tags:
+    - cluster
+    - kubernetes
+    
+deploy:branch:
+  stage: deploy
+  script: 
+    - echo deploy branch
+    - cat envr.txt
+  artifacts:
+    paths:
+      - envr.txt
+  tags:
+    - cluster
+    - kubernetes
+
+deploy:stage:
+  stage: deploy
+  script: 
+    - echo deploy stage
+    - cat envr.txt
+  artifacts:
+    paths:
+      - envr.txt
+  needs: ["build:stage"]
+  tags:
+    - cluster
+    - kubernetes
