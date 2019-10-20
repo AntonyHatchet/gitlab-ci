@@ -48,15 +48,14 @@ stages:
 flow:
   stage: flow
   extends: .install_dependencies
-  # script:
-  #   - echo 'check flow'
+  script:
+    - echo 'check flow'
 
 flow:coverage:
-  extends: 
-    - .install_dependencies
   stage: flow
   script: 
     - echo 'flow coverage 100%'
+  extends: .install_dependencies
 
 storybook:
   stage: storybook
