@@ -46,25 +46,26 @@ stages:
 # Jobs
 flow:
   stage: flow
-  after_script:
+  script:
     - echo 'check flow'
 
 flow:coverage:
   stage: flow
-  after_script:
+  script:
     - echo 'flow coverage 100%'
 
 storybook:
   stage: storybook
-  after_script: 
+  script: 
     - echo 'Build storybook'
 
 bundle_analyzer:
   stage: bundle_analyzer
-  after_script: 
+  script: 
     - echo 'Bundle analyzer'
 
 build:master:
+  extends: .install_dependencies
   stage: build
   only:
     refs:
@@ -101,39 +102,18 @@ build:branch:
   extends: .install_dependencies
   stage: build
   only:
-    refs:
-      - master
-  after_script:
-    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
-    - eval $(ssh-agent -s)
-    - ssh-add <(echo "$SSH_PRIVATE_KEY" | base64 -d)
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan github.com >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-    - git config --global push.default simple
-    - git config --global user.email "gitlab@example.com"
-    - git config --global user.name "Gitlab"
-    - git checkout master
-    - export CURRENT_HASH=$(echo $(git rev-parse --short HEAD))
-    - echo $CURRENT_HASH
-    - export COMMIT_MESSAGE="$(echo $(git log -n 1 --pretty=format:%B))"
-    - echo $COMMIT_MESSAGE
-    - export VERSION_TYPE="patch"
-    - export TAG=$(echo $(git tag --contains $CURRENT_HASH))
-    - echo $TAG
-    #- export VERSION_TYPE=$(node pipelines/get-version-type.js "$COMMIT_MESSAGE")
-    - if [ ! -z "$TAG" ] ; then exit 0; fi
-    - echo $VERSION_TYPE
-    - git --version
-    - git status
-    - npm version $VERSION_TYPE -m "v%s"
-    - git status
-    - git push --follow-tags
+    - /^feature/.*$/
 
 deploy:stage:
   stage: deploy
   needs: ["build:master"]
+  script: 
+    - echo 'Deploy to stage'
+    - echo 'Deploy to stage'
+
+deploy:branch:
+  stage: deploy
+  needs: ["build:branch"]
   script: 
     - echo 'Deploy to stage'
 
@@ -146,19 +126,16 @@ e2e:
     - echo Simulation e2e testing
     - npm run test:ci
   needs: ["deploy:stage"]
-  cache:
-    paths:
-      - node_modules
   artifacts:
     paths: 
       - coverage
     name: coverage
 
 tests:unit:
-  # extends: 
-  #   - .install_dependencies
+  extends: 
+    - .install_dependencies
   stage: tests
-  script: 
+  after_script: 
     - echo 'Bundle analyzer'
     - echo Simulation e2e testing
     - npm run test:ci
