@@ -46,7 +46,7 @@ image:
 
 stages:
   - flow
-  - tests
+  - unit
   - build
   - bundle_analyzer
   - storybook
@@ -79,19 +79,19 @@ bundle_analyzer:
     - echo 'Bundle analyzer'
 
 build:prod:
+  stage: build
   extends: 
     - .install_dependencies
     - .to_prod
     - .show_context
-  stage: build
 
 build:stage:
+  stage: build
   extends: 
     - .install_dependencies
     - .to_stage
     - .prepare_ssh
     - .show_context
-  stage: build
   after_script:
     - git checkout master
     - export CURRENT_HASH=$(echo $(git rev-parse --short HEAD))
@@ -111,11 +111,11 @@ build:stage:
     - git push --follow-tags
 
 build:branch:
+  stage: build
   extends: 
     - .install_dependencies
     - .to_dev
     - .show_context
-  stage: build
   after_script: 
     - echo 'Builded for branch'
 
@@ -158,6 +158,7 @@ deploy:test-1:
 
 e2e:
   stage: e2e
+  parallel: 3
   extends: 
     - .to_stage
     - .show_context
@@ -170,10 +171,11 @@ e2e:
       - coverage
     name: coverage
 
-tests:unit:
+unit:
+  stage: unit
+  parallel: 3
   extends: 
     - .install_dependencies
-  stage: tests
   after_script: 
     - echo 'Bundle analyzer'
     - echo Simulation e2e testing
