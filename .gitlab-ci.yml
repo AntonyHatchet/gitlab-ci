@@ -51,7 +51,8 @@ stages:
       ignore: /.*/
 
 .install_dependencies: 
-  script: yarn --no-progress --frozen-lockfile
+  script: 
+    - yarn --no-progress --frozen-lockfile
 
 .show_env_variables:
   script:
