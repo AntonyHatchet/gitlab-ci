@@ -43,11 +43,10 @@ stages:
   - storybook
   - deploy
   - e2e
-  
+
 # Jobs
 flow:
-  extends:
-    - .install_dependencies
+  extends: .install_dependencies
   stage: flow
   script:
     - echo 'check flow'
