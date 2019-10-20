@@ -40,7 +40,7 @@ stages:
 
 .install_dependencies: 
   script: 
-    - echo install_dependencies
+    - echo 'install_dependencies'
     - yarn --no-progress --frozen-lockfile
 
 .show_env_variables:
@@ -52,8 +52,7 @@ stages:
 
 # Jobs
 flow:
-  extends: 
-    - .show_env_variables
+  extends:
     - .install_dependencies
   stage: flow
   script:
