@@ -60,13 +60,15 @@ storybook:
   stage: storybook
   extends: 
     - .install_dependencies
-  after_script: echo 'Build storybook'
+  after_script: 
+    - echo 'Build storybook'
 
 bundle_analyzer:
   stage: bundle_analyzer
   extends: 
     - .install_dependencies
-  after_script: echo 'Bundle analyzer'
+  after_script: 
+    - echo 'Bundle analyzer'
 
 build:master:
   extends: .install_dependencies
