@@ -123,6 +123,9 @@ e2e:
   extends: 
     - .install_dependencies
   stage: e2e
+  only:
+    refs:
+      - master
   after_script: 
     - echo 'Bundle analyzer'
     - echo Simulation e2e testing
