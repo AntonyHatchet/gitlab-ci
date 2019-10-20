@@ -52,6 +52,7 @@ stages:
 
 .install_dependencies: 
   script: 
+    - echo install_dependencies
     - yarn --no-progress --frozen-lockfile
 
 .show_env_variables:
