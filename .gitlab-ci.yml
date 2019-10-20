@@ -104,6 +104,11 @@ build:branch:
   only:
     - /^feature/.*$/
 
+build:test-2:
+  extends: .install_dependencies
+  stage: build
+  when: manual
+
 deploy:stage:
   stage: deploy
   only:
@@ -119,6 +124,12 @@ deploy:branch:
   script: 
     - echo 'Deploy to stage'
 
+deploy:test-2:
+  stage: deploy
+  needs: ["build:test-2"]
+  script: 
+    - echo 'Deploy to test-2'
+  
 e2e:
   stage: e2e
   only:
