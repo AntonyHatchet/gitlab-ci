@@ -109,13 +109,13 @@ deploy:stage:
   only:
     refs:
       - master
-  needs: ["build:master"]
   script: 
     - echo 'Deploy to stage'
 
 deploy:branch:
   stage: deploy
-  needs: ["build:branch"]
+  only:
+    - /^feature/.*$/
   script: 
     - echo 'Deploy to stage'
 
