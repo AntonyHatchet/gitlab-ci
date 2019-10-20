@@ -56,12 +56,17 @@ flow:coverage:
 
 storybook:
   stage: storybook
+  only:
+    refs:
+      - master
   script: 
     - echo 'Build storybook'
 
 bundle_analyzer:
   stage: bundle_analyzer
-  needs: ["build:*"]
+  only:
+    refs:
+      - master
   script: 
     - echo 'Bundle analyzer'
 
