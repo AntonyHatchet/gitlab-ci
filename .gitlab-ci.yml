@@ -127,7 +127,6 @@ e2e:
     - echo 'Bundle analyzer'
     - echo Simulation e2e testing
     - npm run test:ci
-  needs: ["deploy:stage"]
   artifacts:
     paths: 
       - coverage
