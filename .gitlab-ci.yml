@@ -34,7 +34,6 @@ image:
     - echo 'install_dependencies'
     - yarn --no-progress --frozen-lockfile
 
-
 stages:
   - flow
   - tests
@@ -48,27 +47,26 @@ stages:
 flow:
   stage: flow
   extends: .install_dependencies
-  script:
+  after-script:
     - echo 'check flow'
 
 flow:coverage:
   stage: flow
-  script:
-    - echo 'flow coverage 100%'
   extends: .install_dependencies
-
+  after-script:
+    - echo 'flow coverage 100%'
 
 storybook:
   stage: storybook
   extends: 
     - .install_dependencies
-  script: echo 'Build storybook'
+  after-script: echo 'Build storybook'
 
 bundle_analyzer:
+  stage: bundle_analyzer
   extends: 
     - .install_dependencies
-  stage: bundle_analyzer
-  script: echo 'Bundle analyzer'
+  after-script: echo 'Bundle analyzer'
 
 build:master:
   extends: .install_dependencies
@@ -76,7 +74,7 @@ build:master:
   only:
     refs:
       - master
-  script:
+  after-script:
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
     - eval $(ssh-agent -s)
     - ssh-add <(echo "$SSH_PRIVATE_KEY" | base64 -d)
@@ -114,7 +112,7 @@ e2e:
   extends: 
     - .install_dependencies
   stage: e2e
-  script: 
+  after-script: 
     - echo 'Bundle analyzer'
     - echo Simulation e2e testing
     - npm run test:ci
@@ -128,7 +126,7 @@ tests:unit:
   extends: 
     - .install_dependencies
   stage: tests
-  script: 
+  after-script: 
     - echo 'Bundle analyzer'
     - echo Simulation e2e testing
     - npm run test:ci
