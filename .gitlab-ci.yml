@@ -62,28 +62,32 @@ stages:
 
 # Jobs
 flow:
-  extends: .show_env_variables
-  extends: .install_dependencies
+  extends: 
+    - .show_env_variables
+    - .install_dependencies
   stage: flow
   script:
     - echo 'check flow'
 
 flow:coverage:
-  extends: .show_env_variables
-  extends: .install_dependencies
+  extends: 
+    - .show_env_variables
+    - .install_dependencies
   stage: flow
   script: 
     - echo 'flow coverage 100%'
 
 storybook:
   stage: storybook
-  extends: .show_env_variables
-  extends: .install_dependencies
+  extends: 
+    - .show_env_variables
+    - .install_dependencies
   script: echo 'Build storybook'
 
 bundle_analyzer:
-  extends: .show_env_variables
-  extends: .install_dependencies
+  extends: 
+    - .show_env_variables
+    - .install_dependencies
   stage: bundle_analyzer
   script: echo 'Bundle analyzer'
 
@@ -118,8 +122,9 @@ deploy:stage:
     - echo 'Deploy to stage'
 
 e2e:
-  extends: .show_env_variables
-  extends: .install_dependencies
+  extends: 
+    - .show_env_variables
+    - .install_dependencies
   stage: e2e
   script: 
     - echo 'Bundle analyzer'
@@ -132,8 +137,9 @@ e2e:
     name: coverage
 
 tests:unit:
-  extends: .show_env_variables
-  extends: .install_dependencies
+  extends: 
+    - .show_env_variables
+    - .install_dependencies
   stage: tests
   script: 
     - echo 'Bundle analyzer'
