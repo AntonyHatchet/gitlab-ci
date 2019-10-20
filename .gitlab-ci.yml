@@ -158,7 +158,7 @@ tests:unit:
   # extends: 
   #   - .install_dependencies
   stage: tests
-  after_script: 
+  script: 
     - echo 'Bundle analyzer'
     - echo Simulation e2e testing
     - npm run test:ci
