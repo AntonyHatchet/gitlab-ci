@@ -47,26 +47,26 @@ stages:
 flow:
   stage: flow
   extends: .install_dependencies
-  after-script:
+  after_script:
     - echo 'check flow'
 
 flow:coverage:
   stage: flow
   extends: .install_dependencies
-  after-script:
+  after_script:
     - echo 'flow coverage 100%'
 
 storybook:
   stage: storybook
   extends: 
     - .install_dependencies
-  after-script: echo 'Build storybook'
+  after_script: echo 'Build storybook'
 
 bundle_analyzer:
   stage: bundle_analyzer
   extends: 
     - .install_dependencies
-  after-script: echo 'Bundle analyzer'
+  after_script: echo 'Bundle analyzer'
 
 build:master:
   extends: .install_dependencies
@@ -74,7 +74,7 @@ build:master:
   only:
     refs:
       - master
-  after-script:
+  after_script:
     - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
     - eval $(ssh-agent -s)
     - ssh-add <(echo "$SSH_PRIVATE_KEY" | base64 -d)
@@ -112,7 +112,7 @@ e2e:
   extends: 
     - .install_dependencies
   stage: e2e
-  after-script: 
+  after_script: 
     - echo 'Bundle analyzer'
     - echo Simulation e2e testing
     - npm run test:ci
@@ -126,7 +126,7 @@ tests:unit:
   extends: 
     - .install_dependencies
   stage: tests
-  after-script: 
+  after_script: 
     - echo 'Bundle analyzer'
     - echo Simulation e2e testing
     - npm run test:ci
