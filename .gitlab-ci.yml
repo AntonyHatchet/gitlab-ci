@@ -54,8 +54,8 @@ flow:
 flow:coverage:
   stage: flow
   extends: .install_dependencies
-  script:
-    - echo 'flow coverage 100%'
+  # script:
+  #   - echo 'flow coverage 100%'
 
 storybook:
   stage: storybook
