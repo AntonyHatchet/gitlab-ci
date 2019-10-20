@@ -43,13 +43,6 @@ stages:
     - echo 'install_dependencies'
     - yarn --no-progress --frozen-lockfile
 
-.show_env_variables:
-  script:
-    - echo $REPO_VARIABLE
-    - echo $CONTEXT
-    - echo $API_URL
-    - echo $TOKEN
-
 # Jobs
 flow:
   extends:
@@ -60,7 +53,6 @@ flow:
 
 flow:coverage:
   extends: 
-    - .show_env_variables
     - .install_dependencies
   stage: flow
   script: 
@@ -69,19 +61,17 @@ flow:coverage:
 storybook:
   stage: storybook
   extends: 
-    - .show_env_variables
     - .install_dependencies
   script: echo 'Build storybook'
 
 bundle_analyzer:
   extends: 
-    - .show_env_variables
     - .install_dependencies
   stage: bundle_analyzer
   script: echo 'Bundle analyzer'
 
 build:master:
-  extends: .show_env_variables
+  extends: .install_dependencies
   stage: build
   only:
     refs:
@@ -122,7 +112,6 @@ deploy:stage:
 
 e2e:
   extends: 
-    - .show_env_variables
     - .install_dependencies
   stage: e2e
   script: 
@@ -137,7 +126,6 @@ e2e:
 
 tests:unit:
   extends: 
-    - .show_env_variables
     - .install_dependencies
   stage: tests
   script: 
