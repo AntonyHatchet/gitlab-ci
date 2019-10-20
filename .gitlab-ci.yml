@@ -61,6 +61,7 @@ storybook:
 
 bundle_analyzer:
   stage: bundle_analyzer
+  needs: ["build:*"]
   script: 
     - echo 'Bundle analyzer'
 
