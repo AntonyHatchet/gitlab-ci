@@ -1,15 +1,6 @@
 image:
   name: node:latest
 
-stages:
-  - flow
-  - tests
-  - build
-  - bundle_analyzer
-  - storybook
-  - deploy
-  - e2e
-
 # Extends
 .deploy_to_dev:
   environment:
@@ -43,6 +34,16 @@ stages:
     - echo 'install_dependencies'
     - yarn --no-progress --frozen-lockfile
 
+
+stages:
+  - flow
+  - tests
+  - build
+  - bundle_analyzer
+  - storybook
+  - deploy
+  - e2e
+  
 # Jobs
 flow:
   extends:
