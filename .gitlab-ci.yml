@@ -46,10 +46,10 @@ stages:
 
 # Jobs
 flow:
-  extends: .install_dependencies
   stage: flow
-  script:
-    - echo 'check flow'
+  extends: .install_dependencies
+  # script:
+  #   - echo 'check flow'
 
 flow:coverage:
   extends: 
