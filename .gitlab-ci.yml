@@ -120,7 +120,7 @@ build:branch:
     - echo 'Builded for branch'
 
 build:test-1:
-  stage: buil
+  stage: build
   extends: .install_dependencies
   when: manual
   after_script: 
