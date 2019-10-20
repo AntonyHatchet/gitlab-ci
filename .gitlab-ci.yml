@@ -2,37 +2,47 @@ image:
   name: node:latest
 
 # Extends
-.deploy_to_dev:
-  environment:
-    context: dev
-  filters:
-    branches:
-      only:
-        - /feature\/.*/
-        - /bugfix\/.*/
+.prepare_ssh:
+  script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_PRIVATE_KEY" | base64 -d)
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan github.com >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - git config --global push.default simple
+    - git config --global user.email "gitlab@example.com"
+    - git config --global user.name "Gitlab"
 
-.deploy_to_stage:
-  environment:
-    context: stage
-  filters:
-    tags:
-      only: /v.*/
-    branches:
-      ignore: /.*/
+.to_dev:
+  variables:
+    CONTEXT: DEV
+  only:
+    - /feature\/.*/
+    - /bugfix\/.*/
 
-.deploy_to_production:
-  environment:
-    context: production
-  filters:
-    tags:
-      only: /v.*/
-    branches:
-      ignore: /.*/
+.to_stage:
+  variables:
+    CONTEXT: STAGE
+  only:
+    refs:
+      - master
+
+.to_prod:
+  variables:
+    CONTEXT: PRODUCTION
+  only: 
+    - /v.*/
 
 .install_dependencies: 
   script: 
     - echo 'install_dependencies'
     - yarn --no-progress --frozen-lockfile
+
+.show_context:
+  script:
+    - echo $CONTEXT
 
 stages:
   - flow
@@ -56,37 +66,33 @@ flow:coverage:
 
 storybook:
   stage: storybook
-  only:
-    refs:
-      - master
+  extends: 
+    - .show_context
   script: 
     - echo 'Build storybook'
 
 bundle_analyzer:
   stage: bundle_analyzer
-  only:
-    refs:
-      - master
+  extends: 
+    - .show_context
   script: 
     - echo 'Bundle analyzer'
 
-build:master:
-  extends: .install_dependencies
+build:prod:
+  extends: 
+    - .install_dependencies
+    - .to_prod
+    - .show_context
   stage: build
-  only:
-    refs:
-      - master
+
+build:stage:
+  extends: 
+    - .install_dependencies
+    - .to_stage
+    - .prepare_ssh
+    - .show_context
+  stage: build
   after_script:
-    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )'
-    - eval $(ssh-agent -s)
-    - ssh-add <(echo "$SSH_PRIVATE_KEY" | base64 -d)
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan github.com >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-    - git config --global push.default simple
-    - git config --global user.email "gitlab@example.com"
-    - git config --global user.name "Gitlab"
     - git checkout master
     - export CURRENT_HASH=$(echo $(git rev-parse --short HEAD))
     - echo $CURRENT_HASH
@@ -105,63 +111,56 @@ build:master:
     - git push --follow-tags
 
 build:branch:
-  extends: .install_dependencies
+  extends: 
+    - .install_dependencies
+    - .to_dev
+    - .show_context
   stage: build
-  only:
-    - /^feature/.*$/
+  after_script: 
+    - echo 'Builded for branch'
 
-build:test-2:
+build:test-1:
+  stage: buil
   extends: .install_dependencies
-  stage: build
   when: manual
+  after_script: 
+    - echo 'Builded for test-1'
 
-build:test-3:
-  extends: .install_dependencies
-  stage: build
-  when: manual
-
-build:test-4:
-  extends: .install_dependencies
-  stage: build
-  when: manual
+deploy:prod:
+  stage: deploy
+  extends: 
+    - .to_prod
+    - .show_context
+  after_script: 
+    - echo 'Deploy to prod'
 
 deploy:stage:
   stage: deploy
-  only:
-    refs:
-      - master
+  extends: 
+    - .to_stage
+    - .show_context
   script: 
     - echo 'Deploy to stage'
 
 deploy:branch:
   stage: deploy
-  only:
-    - /^feature/.*$/
-  script: 
-    - echo 'Deploy to stage'
+  extends: 
+    - .to_dev
+    - .show_context
+  after_script: 
+    - echo 'Deploy to branch'
 
-deploy:test-2:
+deploy:test-1:
   stage: deploy
-  needs: ["build:test-2"]
+  needs: ["build:test-1"]
   script: 
-    - echo 'Deploy to test-2'
-  
-deploy:test-3:
-  stage: deploy
-  needs: ["build:test-3"]
-  script: 
-    - echo 'Deploy to test-3'
+    - echo 'Deploy to test-1'
 
-deploy:test-4:
-  stage: deploy
-  needs: ["build:test-4"]
-  script: 
-    - echo 'Deploy to test-4'
 e2e:
   stage: e2e
-  only:
-    refs:
-      - master
+  extends: 
+    - .to_stage
+    - .show_context
   script: 
     - echo 'Bundle analyzer'
     - echo Simulation e2e testing
