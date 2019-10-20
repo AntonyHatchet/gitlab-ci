@@ -142,22 +142,21 @@ deploy:branch:
 
 deploy:test-2:
   stage: deploy
-  dependencies:
-    - build:test-2
+  needs: ["build:test-2"]
   script: 
     - echo 'Deploy to test-2'
   
-# deploy:test-3:
-#   stage: deploy
-#   needs: ["build:test-3"]
-#   script: 
-#     - echo 'Deploy to test-3'
+deploy:test-3:
+  stage: deploy
+  needs: ["build:test-3"]
+  script: 
+    - echo 'Deploy to test-3'
 
-# deploy:test-4:
-#   stage: deploy
-#   needs: ["build:test-4"]
-#   script: 
-#     - echo 'Deploy to test-4'
+deploy:test-4:
+  stage: deploy
+  needs: ["build:test-4"]
+  script: 
+    - echo 'Deploy to test-4'
 e2e:
   stage: e2e
   only:
