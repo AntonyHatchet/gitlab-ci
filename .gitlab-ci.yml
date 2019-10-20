@@ -106,6 +106,9 @@ build:branch:
 
 deploy:stage:
   stage: deploy
+  only:
+    refs:
+      - master
   needs: ["build:master"]
   script: 
     - echo 'Deploy to stage'
