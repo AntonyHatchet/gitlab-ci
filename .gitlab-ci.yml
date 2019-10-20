@@ -109,7 +109,6 @@ deploy:stage:
   needs: ["build:master"]
   script: 
     - echo 'Deploy to stage'
-    - echo 'Deploy to stage'
 
 deploy:branch:
   stage: deploy
